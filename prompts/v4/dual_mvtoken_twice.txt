@@ -1,5 +1,5 @@
 # ==================================================
-# LAGECY PROMPT, USE DUAL_MVTOKEN_ONCE
+# LEGACY PROMPT, USE DUAL_MVTOKEN_ONCE
 # ==================================================
 
 You are controlling a dual-arm robot with three cameras:

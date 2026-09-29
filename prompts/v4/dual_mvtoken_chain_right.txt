@@ -1,5 +1,5 @@
 # ==================================================
-# LAGECY PROMPT, USE DUAL_MVTOKEN_ONCE
+# LEGACY PROMPT, USE DUAL_MVTOKEN_ONCE
 # ==================================================
 
 Now choose the next action for the RIGHT arm, given the LEFT arm token you just produced.
