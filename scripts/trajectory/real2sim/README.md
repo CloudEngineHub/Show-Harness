@@ -16,9 +16,10 @@ real2sim/
 │                            execution, planners (Manhattan, RDP, chase), continuous
 │                            demo recorder, teleop-format writer
 ├── backends/                One adapter per simulator, implementing AtomicSimEnv
-│   ├── __init__.py          make_backend("maniskill" | "robolab", ...)
+│   ├── __init__.py          make_backend("maniskill" | "robolab" | "libero", ...)
 │   ├── maniskill.py
-│   └── robolab.py           RoboLab / Isaac Lab (relative IK, 7-dim action)
+│   ├── robolab.py           RoboLab / Isaac Lab (relative IK, 7-dim action)
+│   └── libero.py            LIBERO family (OSC delta pose, rotation tokens, fixture poses)
 ├── maniskill/
 │   ├── tasks.py             Task table + layout sampling (shared with deployment eval)
 │   ├── oracle.py            Scheme A: privileged oracle (blockpap / blockstack)
@@ -26,17 +27,25 @@ real2sim/
 │   ├── follow_tokenize.py   Scheme D step 2: re-execute tracks as 2 cm single-axis atoms
 │   ├── make_dataset.py      LlamaFactory conversion + stats (step-size/oscillation gates)
 │   └── merge_shards.py      Merge parallel shards, renumber
-└── robolab/
-    ├── tasks.py             Plan parsing (task's own subtasks) + gripper geometry
-    ├── oracle.py            Scheme A: privileged oracle, task-agnostic
-    ├── record_demos.py      Scheme D step 1
-    ├── follow_tokenize.py   Scheme D step 2
-    ├── calibrate_fingertip.py      Behavioural flange-to-fingertip sweep (see gotchas)
-    └── make_short_finger_asset.py  Real rig's fingertip USD (see docs/simulators.md)
+├── robolab/
+│   ├── tasks.py             Plan parsing (task's own subtasks) + gripper geometry
+│   ├── oracle.py            Scheme A: privileged oracle, task-agnostic
+│   ├── record_demos.py      Scheme D step 1
+│   ├── follow_tokenize.py   Scheme D step 2
+│   ├── calibrate_fingertip.py      Behavioural flange-to-fingertip sweep (see gotchas)
+│   └── make_short_finger_asset.py  Real rig's fingertip USD (see docs/simulators.md)
+└── libero/                  No oracle: LIBERO ships human demos, so Scheme D only
+    ├── follow_tokenize.py   Scheme D: re-execute recorded demos as atomic rollouts
+    ├── layout_generate.py   Trajectories for scenes that have NO demo (Objects Layout)
+    ├── render_base_tasks.py Replay one demo per original task behind LIBERO-plus
+    ├── rerender.py          Re-render rollouts under visual perturbations, no re-execution
+    ├── probe.py             Measure what one token physically does, against the lattice
+    ├── token_stats.py       Per-token execution stats read back from ee_pose records
+    └── make_videos.py       One review video per task
 ```
 
 Everything that only calls the backend interface lives in the core: `DemoRecorder` (the
-continuous servo recorder) and `gripper_events` are shared by both simulators, so each
+continuous servo recorder) and `gripper_events` are shared by every simulator, so each
 simulator adds only the scripted demonstration itself — which privileged poses to servo
 to, in what order. `make_dataset.py` (conversion + quality gates) is likewise sim-agnostic.
 
@@ -216,6 +225,7 @@ Franka wears to match the real rig; embodiment and camera details in
 `configs/robot_maniskill*.yaml` sets `step_m: 0.026` x `sim_steps_per_decision: 2`,
 measured at 20.2 +/- 0.2 mm per decision — matching the data's 2 cm; `wrist_flip: both`
 and `agentview_square_size: 256` match the transforms applied at generation time.
-Evaluate with `bash scripts/maniskill/eval_batch.sh <config> <model> <N>` or
-`bash scripts/robolab/eval_batch.sh <model> <N> [task ...]`. Scene, camera and simulator
+Evaluate with `bash scripts/maniskill/eval_batch.sh <config> <model> <N>`,
+`bash scripts/robolab/eval_batch.sh <model> <N> [task ...]`, or
+`PY=<checkout>/.venv/bin/python bash scripts/libero/eval_batch.sh <model> <N> [suite ...]`. Scene, camera and simulator
 setup details: `../../../docs/simulators.md`.

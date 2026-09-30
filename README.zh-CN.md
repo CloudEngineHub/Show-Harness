@@ -79,7 +79,7 @@ https://github.com/user-attachments/assets/bd2d31db-f5c5-4554-85bb-2aa206876ac7
 依托一套接口，闭源前沿模型可**零样本**直接控制机器人；小规模开源模型亦只需**不到几个 H200 GPU 小时**的微调，即可成为可用的策略
 
 - 🤖 **两种模式，一套接口** —— 前沿 VLM 零样本驱动，或由微调后的小模型逐步输出单个动作 token
-- 🦾 **不依赖特定本体** —— Franka、AgileX Piper（单臂与双臂）、ManiSkill、Isaac Lab 共用同一套动作词表与提示词
+- 🦾 **不依赖特定本体** —— Franka、AgileX Piper（单臂与双臂）、ManiSkill、Isaac Lab、LIBERO 共用同一套动作词表与提示词
 - 🎮 **GUMI 示教采集** —— 在浏览器中操作机器人即完成一次示教，无需遥操作硬件，数据亦无需后处理
 - 🧩 **插件支持严格消融** —— 一个目录、一个开关；关闭后主循环与「不存在该插件」时逐字节一致
 
@@ -95,6 +95,7 @@ https://github.com/user-attachments/assets/bd2d31db-f5c5-4554-85bb-2aa206876ac7
 | --- | --- | --- |
 | `.venv` | `bash scripts/setup.sh base` | harness 主体：采集数据、运行机器人、调用已部署的 VLM |
 | `.venv-vllm` | `bash scripts/setup.sh serve` | 在本地部署 VLM 服务（`scripts/serve_vlm.sh`） |
+| `<checkout>/.venv` | `bash scripts/setup.sh libero <checkout>` | LIBERO / LIBERO-plus / LIBERO-PRO 的某个 checkout；harness 会装进该环境并在其中运行（[docs/simulators.md](docs/simulators.md)） |
 
 接入真机时追加 `--real`（`bash scripts/setup.sh base --real`），以安装 Franka/Piper 所需的硬件依赖：RealSense、若干 ROS 兼容层与遥操作窗口。仅运行零样本或仿真实验时无需安装
 
@@ -143,7 +144,7 @@ bash scripts/setup.sh base
 | `gumi/` | GUMI：浏览器遥操作与智能体操作器，每一步均存为可直接用于训练的 (观测, 动作) 对 |
 | `configs/` | 分层配置：内置默认值 + 本地 site 信息 + 可选 overlay（[configs/README.md](configs/README.md)） |
 | `prompts/` | 零样本模式的控制器提示词，以及各微调 checkpoint 对应版本的提示词 |
-| `scripts/` | 平台启动、标定采集、模型部署与数据采集 |
+| `scripts/` | 平台启动、标定采集、模型部署、数据采集，以及各仿真器的批量评测（`scripts/<sim>/eval_batch.sh`） |
 | `train/` | 微调全流程：数据转换、数据集注册、LoRA 配置（[train/README.md](train/README.md)） |
 | `models/` | 对话模板、已下载的适配器与 HuggingFace 缓存（[models/README.md](models/README.md)） |
 | `docs/` | 各平台的操作手册与微调模式说明 |
@@ -212,7 +213,7 @@ Show-Harness 构建于以下开源工作之上：
 - **训练** —— [LLaMA-Factory](https://github.com/hiyouga/LLaMA-Factory)
 - **推理服务** —— [vLLM](https://github.com/vllm-project/vllm)
 - **Franka 控制** —— [Polymetis](https://facebookresearch.github.io/fairo/polymetis/)
-- **仿真** —— [ManiSkill](https://github.com/haosulab/ManiSkill)、[Isaac Lab](https://github.com/isaac-sim/IsaacLab)
+- **仿真** —— [ManiSkill](https://github.com/haosulab/ManiSkill)、[Isaac Lab](https://github.com/isaac-sim/IsaacLab)、[LIBERO](https://github.com/Lifelong-Robot-Learning/LIBERO)、[LIBERO-plus](https://github.com/sylvestf/LIBERO-plus)、[LIBERO-PRO](https://github.com/Zxy-MLlab/LIBERO-PRO)
 - **硬件 SDK** —— [AgileX Piper](https://github.com/agilexrobotics)
 - **开源基座模型** —— Qwen3.5、Gemma 4 与 InternVL3.5，本项目发布的适配器均基于其训练
 

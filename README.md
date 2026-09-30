@@ -79,7 +79,7 @@ https://github.com/user-attachments/assets/bd2d31db-f5c5-4554-85bb-2aa206876ac7
 Through the same interface, a closed-source frontier VLM controls a robot **zero-shot**, and a small open model becomes a capable policy with **less than a few H200 GPU-hours** of fine-tuning.
 
 - 🤖 **Two modes, one interface** — a frontier VLM zero-shot, or a fine-tuned small VLM emitting one action token per step.
-- 🦾 **Embodiment-agnostic** — Franka, AgileX Piper (single and dual arm), ManiSkill, and Isaac Lab share one vocabulary and one prompt set.
+- 🦾 **Embodiment-agnostic** — Franka, AgileX Piper (single and dual arm), ManiSkill, Isaac Lab, and LIBERO share one vocabulary and one prompt set.
 - 🎮 **GUMI** — demonstrate a task by playing the robot in a browser; no teleoperation hardware, no post-processing.
 - 🧩 **Ablation-grade plugins** — one directory, one boolean, and byte-identical to no plugin when disabled.
 
@@ -96,6 +96,7 @@ you need them. `bash scripts/setup.sh` with no arguments prints which already ex
 | --- | --- | --- |
 | `.venv` | `bash scripts/setup.sh base` | the harness: collect, run a robot, drive a served VLM |
 | `.venv-vllm` | `bash scripts/setup.sh serve` | serving a VLM locally (`scripts/serve_vlm.sh`) |
+| `<checkout>/.venv` | `bash scripts/setup.sh libero <checkout>` | a LIBERO / LIBERO-plus / LIBERO-PRO checkout; the harness is installed into it and run from there ([docs/simulators.md](docs/simulators.md)) |
 
 `bash scripts/setup.sh base --real` adds the Franka/Piper hardware layer (RealSense, ROS
 shims, teleop window). Zero-shot and sim work do not need it.
@@ -163,7 +164,7 @@ The full walkthroughs are in [docs/franka.md](docs/franka.md) and
 | `gumi/` | GUMI: browser teleoperation + agent operators; every step is recorded as a ready (observation, action) training pair |
 | `configs/` | Layered configs: shipped defaults + your site identity + optional overlays ([configs/README.md](configs/README.md)) |
 | `prompts/` | Controller prompts (zero-shot) and the versioned prompt contracts of fine-tuned checkpoints |
-| `scripts/` | Rig bring-up, calibration capture, serving, data collection |
+| `scripts/` | Rig bring-up, calibration capture, serving, data collection, and per-simulator batch evaluation (`scripts/<sim>/eval_batch.sh`) |
 | `train/` | The fine-tuning pipeline: data conversion, dataset registration, LoRA configs ([train/README.md](train/README.md)) |
 | `models/` | Chat templates, downloaded adapters, the HuggingFace cache ([models/README.md](models/README.md)) |
 | `docs/` | Per-rig runbooks and the fine-tuned mode guide |
@@ -252,7 +253,7 @@ Show-Harness builds on the following open-source work:
 - **Training** — [LLaMA-Factory](https://github.com/hiyouga/LLaMA-Factory)
 - **Serving** — [vLLM](https://github.com/vllm-project/vllm)
 - **Franka control** — [Polymetis](https://facebookresearch.github.io/fairo/polymetis/)
-- **Simulation** — [ManiSkill](https://github.com/haosulab/ManiSkill), [Isaac Lab](https://github.com/isaac-sim/IsaacLab)
+- **Simulation** — [ManiSkill](https://github.com/haosulab/ManiSkill), [Isaac Lab](https://github.com/isaac-sim/IsaacLab), [LIBERO](https://github.com/Lifelong-Robot-Learning/LIBERO), [LIBERO-plus](https://github.com/sylvestf/LIBERO-plus), [LIBERO-PRO](https://github.com/Zxy-MLlab/LIBERO-PRO)
 - **Hardware SDK** — [AgileX Piper](https://github.com/agilexrobotics)
 - **Open backbones** — Qwen3.5, Gemma 4, and InternVL3.5, which the released adapters are trained on
 
