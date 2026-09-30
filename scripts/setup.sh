@@ -7,10 +7,15 @@ set -euo pipefail
 #   bash scripts/setup.sh base           # .venv        the harness
 #   bash scripts/setup.sh base --real    #              + Franka/Piper hardware layer
 #   bash scripts/setup.sh serve          # .venv-vllm   serve a VLM locally
+#   bash scripts/setup.sh libero <dir>   # <dir>/.venv  a LIBERO-family simulator repo
 #
 # Two venvs because their pins conflict: serving holds transformers where the harness does
 # not want it. Start with `base`; driving a robot against an already-served VLM needs
 # nothing else, and a hosted endpoint needs no `serve` either.
+#
+# LIBERO is the exception to "the harness runs in .venv": the simulator repos pin their own
+# Python and numpy, so the harness is installed INTO each simulator venv and run from there
+# by absolute path. See scripts/setup_libero.sh.
 #
 # TRAINING is separate and self-contained under train/ -- it builds its own venvs against
 # upstream LLaMA-Factory, with per-family transformers pins:
@@ -23,7 +28,7 @@ VENV="${SHOWHARNESS_VENV:-${REPO_ROOT}/.venv}"
 VLLM_VENV="${SHOWHARNESS_VLLM_VENV:-${REPO_ROOT}/.venv-vllm}"
 PYTHON_VERSION="${PYTHON_VERSION:-3.11}"
 
-usage() { sed -n '4,20p' "$0" | sed 's/^# \?//'; }
+usage() { sed -n '4,24p' "$0" | sed 's/^# \?//'; }
 
 status() {
   local mark
@@ -37,8 +42,9 @@ status() {
     [ -f "${path}/bin/activate" ] && mark="built" || mark="--"
     printf '  %-9s %-38s %-7s %s\n' "$what" "${path#"${REPO_ROOT}/"}" "$mark" "$desc"
   done
-  usage | sed -n '2,6p'
+  usage | sed -n '2,7p'
   echo
+  echo "  LIBERO venvs live in the simulator repos, not here: bash scripts/setup.sh libero <dir>"
   echo "  Training has its own setup: bash train/scripts/setup_llamafactory.sh"
 }
 
@@ -101,9 +107,10 @@ case "${1:-}" in
   ""|-h|--help)  [ "${1:-}" = "" ] && status || usage ;;
   base)   shift; setup_base "$@" ;;
   serve)  shift; [ $# -gt 0 ] && { echo "serve takes no options" >&2; exit 1; }; setup_serve ;;
+  libero) shift; exec bash "$(dirname "${BASH_SOURCE[0]}")/setup_libero.sh" "$@" ;;
   train)  echo "Training setup lives with the training code:" >&2
           echo "  bash train/scripts/setup_llamafactory.sh              # qwen3_5 / internvl3_5" >&2
           echo "  bash train/scripts/setup_llamafactory.sh --gemma4     # add this to also train gemma4" >&2
           exit 1 ;;
-  *) echo "unknown target: $1 (base / serve)" >&2; exit 1 ;;
+  *) echo "unknown target: $1 (base / serve / libero)" >&2; exit 1 ;;
 esac

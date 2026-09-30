@@ -1,6 +1,6 @@
 # Simulators
 
-Show-Harness integrates two simulators. They serve two roles:
+Show-Harness integrates three simulators. They serve two roles:
 
 1. **Zero-shot evaluation** — run the deployment pipelines (the subgoal planner
    stack or the fine-tuned action model, see `docs/finetuned.md`) in sim
@@ -12,6 +12,59 @@ Show-Harness integrates two simulators. They serve two roles:
 Each integration keeps the deployment contracts: the same nine-token action
 vocabulary, the same image transforms (`core/record/images.py`), and measured
 per-config step calibration so one token means ~2 cm of physical travel.
+
+## LIBERO
+
+The standard manipulation benchmark, plus the two robustness suites built on it.
+All three are separate checkouts that install as the same `libero` package, so
+they share one runner and one camera contract and differ only in which
+interpreter you point at them:
+
+| checkout | what it adds | protocol |
+| --- | --- | --- |
+| LIBERO | the original suites | `--suite <name> --episodes N` |
+| LIBERO-plus | seven perturbation dimensions over one large suite | `--libero-plus`, every task once |
+| LIBERO-PRO | perturbation suites beside the base one (`*_object`, `*_swap`, `*_lan`, `*_task`, `*_temp`, and the `*_env_*` / `*_with_*` / numbered families) | `--suite <perturbed> --tasks <base task names>` |
+
+- `scripts/run_libero_mvtoken.py` — entry point; config `configs/robot_libero.yaml`.
+- `scripts/libero/eval_batch.sh <model> <n_episodes> [suite ...]` — batch eval,
+  one process per suite. `PY=` selects the checkout, `RUN_ARGS=` the protocol;
+  everything else is identical across the three.
+- `bash scripts/setup.sh libero <checkout>` builds that checkout's venv
+  (Python 3.10, torch 2.6.0+cu124, this repo's requirements installed alongside).
+
+```bash
+PY=../LIBERO-PRO/.venv/bin/python bash scripts/libero/eval_batch.sh <adapter> 10 \
+    libero_spatial libero_spatial_object libero_spatial_swap libero_spatial_lan libero_spatial_task
+PY=../LIBERO-plus/.venv/bin/python RUN_ARGS=--libero-plus \
+    bash scripts/libero/eval_batch.sh <adapter> 1 libero_spatial
+```
+
+Add `RUN_ARGS="--ignore-done"` when comparing against published numbers: the
+other VLAs have no stop action, so their episodes end only on the environment's
+success check or the step limit.
+
+Facts that do not fail loudly (the reason each is handled in code):
+
+- **The task sentence must come from the bddl**, never `task.language`:
+  LIBERO-plus appends the variant name to it, and LIBERO-PRO derives it from the
+  file stem, so in exactly the two suites that perturb the instruction
+  (`*_lan`, `*_task`) it reports the *un*perturbed sentence. `bddl_language()`
+  in the runner reads the bddl, the way the data generator did.
+- **agentview is rendered upside down.** Upstream un-flips it with
+  `obs[cam][::-1]`, a vertical flip; this repo rotates 180°. Both stand the
+  scene upright but differ by a horizontal mirror, and they disagree about which
+  way is right — under `[::-1]` world +y moves left on screen, under the
+  rotation it moves right, and `MV_RIGHT` has to look like right. Our frames are
+  therefore mirrored with respect to upstream figures. Generation and inference
+  both read `configs/robot_libero.yaml`, so changing it invalidates every frame
+  the policy was trained on.
+- **Fixtures are not in the state vector.** Cabinets and stoves have no joints,
+  so LIBERO samples their placement into `model.body_pos` on every `reset()`, a
+  few mm apart each time — measured at 2.7% of agentview pixels off by >20/255.
+  A single-episode re-run is therefore *not* the same scene as that episode
+  inside a full run. Store `fixture_poses()` with the rollout and
+  `set_fixture_poses()` before re-rendering; `--replay` already does.
 
 ## ManiSkill
 
