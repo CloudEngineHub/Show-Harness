@@ -224,14 +224,11 @@ Show-Harness 构建于以下开源工作之上：
 如果 Show-Harness 对您有帮助，欢迎引用我们的工作：
 
 ```bibtex
-@misc{chen2026showharnessjustvlmagent,
-      title={Show-Harness: Just a VLM Agent Can Play Robots}, 
-      author={Yanzhe Chen and Zechen Bai and Zhijun Cao and Wenzheng Zeng and Kevin Qinghong Lin and Yiqi Lin and Guoqiang Liang and Kevin Yuchen Ma and Qiming Huang and Mike Zheng Shou},
-      year={2026},
-      eprint={2609.10522},
-      archivePrefix={arXiv},
-      primaryClass={cs.RO},
-      url={https://arxiv.org/abs/2609.10522}, 
+@article{chen2026show,
+  title={Show-harness: Just a vlm agent can play robots},
+  author={Chen, Yanzhe and Bai, Zechen and Cao, Zhijun and Zeng, Wenzheng and Lin, Kevin Qinghong and Lin, Yiqi and Liang, Guoqiang and Ma, Kevin Yuchen and Huang, Qiming and Shou, Mike Zheng},
+  journal={arXiv preprint arXiv:2609.10522},
+  year={2026}
 }
 ```
 
