@@ -1,0 +1,27 @@
+# LIBERO / LIBERO-plus camera contract, read by the real2sim generators through
+# core.config.camera_contract() -- the same place a LIBERO deployment runner must read it.
+#
+# Verified conventions (carried over from the legacy AgentRobot LIBERO runner, re-checked on
+# LIBERO-plus 2026-09-19):
+#   * agentview is rendered upside down; rotating 180 deg gives the upright view in which
+#     +x (MV_FWD) moves toward the camera, +y (MV_RIGHT) moves right, +z (MV_UP) moves up.
+#   * the wrist (robot0_eye_in_hand) is used in its NATIVE orientation: fingertips at the
+#     top of the frame and left/right agreeing with the rotated agentview.
+#   * both views are rendered square (256), so no crop and no letterbox.
+#
+# Why 180 deg and not LIBERO's own flip (re-measured 2026-09-30, driving the TCP along world
+# +y and reading the frames back): upstream un-flips the same upside-down render with
+# `obs[cam][::-1]` (utils/video_utils.py, LIBERO-plus randomizer/bddl_operators.py), a
+# VERTICAL flip. Both land the scene upright, but they differ by a horizontal mirror, and
+# the two disagree about which way is right: under `[::-1]` world +y moves LEFT on screen,
+# under 180 deg it moves RIGHT. MV_RIGHT has to look like right to the policy, so this
+# contract takes the rotation. The cost is that our frames are mirrored with respect to
+# upstream's videos and any figure taken from them -- do not mix the two in one dataset, and
+# do not "fix" this to match a published screenshot: generation and inference both read this
+# file, so changing it silently invalidates every frame the policy was trained on.
+agentview_camera: agentview
+wrist_camera: robot0_eye_in_hand
+agentview_rotation_degrees: 180
+agentview_flip: none
+wrist_rotation_degrees: 0
+wrist_flip: none
