@@ -46,6 +46,7 @@ https://github.com/user-attachments/assets/bd2d31db-f5c5-4554-85bb-2aa206876ac7
 
 ## 🔥 最新进展
 
+- [x] `2026.09` 在 Show-Harness 之外，我们还发布了 [Awesome Multimodal Embodied Agents](https://github.com/showlab/Awesome-Multimodal-Embodied-Agent)：一份梳理 **Agent + Robot** 方向的综述，从 computer-use 到 **robot-use**
 - [x] `2026.09` 正式开源：harness 主体、GUMI 采集工具、完整插件套件与训练流程
 - [x] `2026.09` 六个 LoRA 适配器发布于 [🤗 Show-Harness-VLMs](https://huggingface.co/showlab/Show-Harness-VLMs)，配套示教数据发布于 [🤗 Show-Harness-Data](https://huggingface.co/datasets/showlab/Show-Harness-Data)
 
@@ -75,9 +76,9 @@ https://github.com/user-attachments/assets/bd2d31db-f5c5-4554-85bb-2aa206876ac7
 
 **Show-Harness** 在视觉语言模型与机器人之间引入一层轻量的「具身外壳」（Embodied Harness）：它将控制抽象为一组离散、增量式的语义动作单元，模型只需在该动作空间内推理，各本体的解释器再将所选单元确定性地映射为机械臂的实际运动。由此，每一步的物理决策始终出自模型本身，而无需另行学习一个专用的控制策略
 
-依托一套接口，闭源前沿模型可**零样本**直接控制机器人；小规模开源模型亦只需**不足一个 H200 GPU 小时**的微调，即可成为可用的策略
+依托一套接口，闭源前沿模型可**零样本**直接控制机器人；小规模开源模型亦只需**不到几个 H200 GPU 小时**的微调，即可成为可用的策略
 
-- 🤖 **一套接口，两种模式** —— 前沿 VLM 零样本驱动，或由微调后的小模型逐步输出单个动作 token
+- 🤖 **两种模式，一套接口** —— 前沿 VLM 零样本驱动，或由微调后的小模型逐步输出单个动作 token
 - 🦾 **不依赖特定本体** —— Franka、AgileX Piper（单臂与双臂）、ManiSkill、Isaac Lab 共用同一套动作词表与提示词
 - 🎮 **GUMI 示教采集** —— 在浏览器中操作机器人即完成一次示教，无需遥操作硬件，数据亦无需后处理
 - 🧩 **插件支持严格消融** —— 一个目录、一个开关；关闭后主循环与「不存在该插件」时逐字节一致
@@ -161,7 +162,7 @@ bash scripts/setup.sh base
 
 ## 📦 开源模型与数据
 
-在真机语料上训练的五个 LoRA 适配器（每个基座一个）发布于[showlab/Show-Harness-VLMs](https://huggingface.co/showlab/Show-Harness-VLMs)：`qwen3_5_0_8b`、`qwen3_5_2b`、`qwen3_5_4b`、`qwen3_5_9b`、`gemma4_e4b`；此外还有 `qwen3_5_2b_sim`，以单一策略覆盖两个仿真器。训练所用的示教数据发布于 [showlab/Show-Harness-Data](https://huggingface.co/datasets/showlab/Show-Harness-Data)（真机 Franka/Piper rollout，以及 RoboLab 与 ManiSkill）
+在真机语料上训练的五个 LoRA 适配器（每个基座一个）发布于 [showlab/Show-Harness-VLMs](https://huggingface.co/showlab/Show-Harness-VLMs)：`qwen3_5_0_8b`、`qwen3_5_2b`、`qwen3_5_4b`、`qwen3_5_9b`、`gemma4_e4b`；此外还有 `qwen3_5_2b_sim`，以单一策略覆盖两个仿真器。训练所用的示教数据发布于 [showlab/Show-Harness-Data](https://huggingface.co/datasets/showlab/Show-Harness-Data)（真机 Franka/Piper rollout，以及 RoboLab 与 ManiSkill）
 
 下载适配器及其所需基座，部署服务，随后运行机器人：
 
@@ -178,7 +179,7 @@ MODEL=Qwen/Qwen3.5-2B \
 python scripts/run_real_mvtoken.py --robot-config configs/robot_franka_ft.yaml
 ```
 
-`FAMILY` 用于从 `models/chat_templates/` 中选择 jinja 模板。训练阶段并不读取它——对话由 LlamaFactory 自行渲染——这些模板的唯一作用，是让 vLLM 在推理时复现与训练完全一致的输入。基座模型自带的模板无法做到这一点，且不一致时不会报错，只会静默劣化，详见[models/README.md](models/README.md)
+`FAMILY` 用于从 `models/chat_templates/` 中选择 jinja 模板。训练阶段并不读取它——对话由 LlamaFactory 自行渲染——这些模板的唯一作用，是让 vLLM 在推理时复现与训练完全一致的输入。基座模型自带的模板无法做到这一点，且不一致时不会报错，只会静默劣化，详见 [models/README.md](models/README.md)
 
 训练自有模型，[train/](train/) 可将 rollout（自采数据或上述发布数据）训练为三个受支持系列中任意一个的 LoRA
 
@@ -234,8 +235,8 @@ Show-Harness 构建于以下开源工作之上：
 
 如果您喜欢我们的项目，欢迎在 GitHub 上给我们一个 Star ⭐ 以获取最新动态！
 
-<!-- Star history: star-history.com reads the star timeline anonymously, so this renders
-     only once the repo is public -- and it stays an unflattering flat line until there are
-     enough stars to plot. Uncomment when the curve is worth showing.
-<a href="https://star-history.com/#showlab/Show-Harness&Date"><img alt="Star History Chart" src="https://api.star-history.com/svg?repos=showlab/Show-Harness&type=Date"></a>
--->
+<p align="center">
+  <a href="https://star-history.com/#showlab/Show-Harness&Date">
+    <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=showlab/Show-Harness&type=Date" width="100%">
+  </a>
+</p>
