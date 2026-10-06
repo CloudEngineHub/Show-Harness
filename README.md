@@ -255,7 +255,7 @@ Show-Harness builds on the following open-source work:
 - **Franka control** — [Polymetis](https://facebookresearch.github.io/fairo/polymetis/)
 - **Simulation** — [ManiSkill](https://github.com/haosulab/ManiSkill), [Isaac Lab](https://github.com/isaac-sim/IsaacLab), [LIBERO](https://github.com/Lifelong-Robot-Learning/LIBERO), [LIBERO-plus](https://github.com/sylvestf/LIBERO-plus), [LIBERO-PRO](https://github.com/Zxy-MLlab/LIBERO-PRO)
 - **Hardware SDK** — [AgileX Piper](https://github.com/agilexrobotics)
-- **Open backbones** — Qwen3.5, Gemma 4, and InternVL3.5, which the released adapters are trained on
+- **Open backbones** — [Qwen3.5](https://huggingface.co/collections/Qwen/qwen35), [Gemma 4](https://huggingface.co/collections/google/gemma-4), and [InternVL3.5](https://huggingface.co/collections/OpenGVLab/internvl35), which the released adapters are trained on
 
 Thanks to all **[Show Lab @ NUS](https://sites.google.com/view/showlab)** members for their support.
 
