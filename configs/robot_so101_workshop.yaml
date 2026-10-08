@@ -1,0 +1,41 @@
+# SO-101 (LeRobot, 5-DoF) on the NVIDIA Sim-to-Real SO-101 Workshop v1.0 (Isaac Lab).
+# Backend: scripts/trajectory/real2sim/backends/so101_workshop.py
+# Interpreter: interpreters/so101_atomic_controller.py, primitives: configs/primitives_so101.yaml
+# Runs inside the Workshop's own image: scripts/trajectory/real2sim/so101_workshop/run_in_docker.sh
+
+task: Lerobot-So101-Teleop-Vials-To-Rack-DR   # the Workshop's vials -> rack task, with its DR
+env_step_hz: 60          # physics 120 Hz, decimation 2; joint position targets
+env_steps_per_ctrl: 2    # one control step = 30 Hz
+primitives_config: configs/primitives_so101.yaml
+
+# Optional scene variants (backend make() kwargs):
+fixed_look: false        # true: arm white / jaws black every episode instead of the DR colour
+preplaced_vial: true     # false: never pre-insert a vial in the rack (Workshop: 1 in 3 resets)
+
+# ---- Cameras: THE contract (read by generators via core.config.camera_contract) ----------
+# Both Workshop cameras render 640x480. Raw, neither matches the shared prompt geometry
+# (prompts/controller.txt, non-ego agentview: image left/right -> MV_LEFT/RIGHT, image bottom ->
+# MV_FWD, top -> MV_BACK; wrist: fingertips at the TOP, wrist left == MV_LEFT):
+#   external_D455 raw .. robot base on the image right; MV_FWD moves the hand image-LEFT and
+#                        MV_LEFT image-UP
+#   ego (wrist) raw .... fingertips at the BOTTOM; MV_LEFT heads image-RIGHT
+# Proper rotations (no mirror) fix both:
+#   agentview 90 deg CCW -> MV_FWD down, MV_LEFT left;  wrist 180 deg -> fingertips top, MV_LEFT left
+# Measured, not assumed: scripts/trajectory/real2sim/so101_workshop/check_views.py pushes each
+# MV_* motion (agentview: TCP projection; wrist: scene shift between rendered frames) and the
+# finger pixels through rotate_and_flip itself and fails on any mismatch. 2026-10-08, seed 0,
+# pitch 47 deg, after the contract (u right, v down; px per 5 cm on the agentview, per 2 cm token
+# on the wrist):
+#   agentview  MV_FWD (-4, 54)  MV_BACK (4, -55)  MV_LEFT (-35, -8)  MV_RIGHT (40, 9)
+#   wrist      MV_FWD (12, 44)  MV_BACK (-12, -40) MV_LEFT (-52, 12) MV_RIGHT (48, -24)
+#   wrist fingers centroid: raw (313, 415) -> (326, 64), i.e. at the top          -> PASS
+# Cost: the rotated agentview is portrait (480x640), so its 256 letterbox has bars left/right
+# instead of top/bottom.
+agentview_camera: external_D455
+wrist_camera: ego
+agentview_rotation_degrees: 90
+agentview_flip: none
+agentview_square_size: 256
+wrist_rotation_degrees: 180
+wrist_flip: none
+wrist_square_size: 256
