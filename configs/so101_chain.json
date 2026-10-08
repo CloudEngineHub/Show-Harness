@@ -1,0 +1,365 @@
+{
+ "source": "UsdPhysics joints of the SO-101 USD in NVIDIA Sim-to-Real-SO-101-Workshop v1.0 (Apache-2.0, tag v1.0 = d327be4), extracted by scripts/trajectory/real2sim/so101_workshop/dump_kinematics.py",
+ "robot_root": "/World/envs/env_0/Robot",
+ "joint_names": [
+  "Rotation",
+  "Pitch",
+  "Elbow",
+  "Wrist_Pitch",
+  "Wrist_Roll",
+  "Jaw"
+ ],
+ "body_names": [
+  "base",
+  "shoulder",
+  "upper_arm",
+  "lower_arm",
+  "wrist",
+  "gripper",
+  "jaw"
+ ],
+ "joints": [
+  {
+   "path": "/World/envs/env_0/Robot/joints/Rotation",
+   "name": "Rotation",
+   "type": "PhysicsRevoluteJoint",
+   "body0": "/World/envs/env_0/Robot/base",
+   "body1": "/World/envs/env_0/Robot/shoulder",
+   "localPos0": [
+    0.02079089917242527,
+    -0.023074500262737274,
+    0.09488169848918915
+   ],
+   "localRot0_wxyz": [
+    -8.963205004874908e-07,
+    0.7071055173873901,
+    0.7071080803871155,
+    -8.96323683718947e-07
+   ],
+   "localPos1": [
+    3.469446951953614e-18,
+    3.469446951953614e-18,
+    0.0
+   ],
+   "localRot1_wxyz": [
+    1.0,
+    -3.677072006797767e-14,
+    3.8411286488034964e-17,
+    4.588882984539466e-14
+   ],
+   "axis": "Z",
+   "lower_deg": -109.99987030029297,
+   "upper_deg": 109.99987030029297
+  },
+  {
+   "path": "/World/envs/env_0/Robot/joints/Pitch",
+   "name": "Pitch",
+   "type": "PhysicsRevoluteJoint",
+   "body0": "/World/envs/env_0/Robot/shoulder",
+   "body1": "/World/envs/env_0/Robot/upper_arm",
+   "localPos0": [
+    -0.030399199575185776,
+    -0.01827779784798622,
+    -0.054200008511543274
+   ],
+   "localRot0_wxyz": [
+    -0.49999818205833435,
+    0.4999999701976776,
+    0.5,
+    0.5000017881393433
+   ],
+   "localPos1": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "localRot1_wxyz": [
+    1.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   "axis": "Z",
+   "lower_deg": -100.00003814697266,
+   "upper_deg": 100.00003814697266
+  },
+  {
+   "path": "/World/envs/env_0/Robot/joints/Elbow",
+   "name": "Elbow",
+   "type": "PhysicsRevoluteJoint",
+   "body0": "/World/envs/env_0/Robot/upper_arm",
+   "body1": "/World/envs/env_0/Robot/lower_arm",
+   "localPos0": [
+    -0.11257001757621765,
+    -0.028000006452202797,
+    -3.6395834263069915e-11
+   ],
+   "localRot0_wxyz": [
+    0.7071055769920349,
+    3.840602502691581e-08,
+    -3.0007449858260316e-09,
+    0.7071080207824707
+   ],
+   "localPos1": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "localRot1_wxyz": [
+    1.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   "axis": "Z",
+   "lower_deg": -100.00003814697266,
+   "upper_deg": 90.00020599365234
+  },
+  {
+   "path": "/World/envs/env_0/Robot/joints/Wrist_Pitch",
+   "name": "Wrist_Pitch",
+   "type": "PhysicsRevoluteJoint",
+   "body0": "/World/envs/env_0/Robot/lower_arm",
+   "body1": "/World/envs/env_0/Robot/wrist",
+   "localPos0": [
+    -0.1349000334739685,
+    0.005199979990720749,
+    -2.264921228345429e-08
+   ],
+   "localRot0_wxyz": [
+    -0.7071055173873901,
+    1.0536121664017628e-07,
+    4.915842310992957e-08,
+    0.7071080207824707
+   ],
+   "localPos1": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "localRot1_wxyz": [
+    1.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   "axis": "Z",
+   "lower_deg": -94.99983215332031,
+   "upper_deg": 94.99983215332031
+  },
+  {
+   "path": "/World/envs/env_0/Robot/joints/Wrist_Roll",
+   "name": "Wrist_Roll",
+   "type": "PhysicsRevoluteJoint",
+   "body0": "/World/envs/env_0/Robot/wrist",
+   "body1": "/World/envs/env_0/Robot/gripper",
+   "localPos0": [
+    4.461247371523314e-09,
+    -0.061100032180547714,
+    0.018100006505846977
+   ],
+   "localRot0_wxyz": [
+    6.152631044642476e-07,
+    1.029495592774765e-06,
+    0.7071080803871155,
+    0.7071054577827454
+   ],
+   "localPos1": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "localRot1_wxyz": [
+    1.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   "axis": "Z",
+   "lower_deg": -160.00018310546875,
+   "upper_deg": 160.00018310546875
+  },
+  {
+   "path": "/World/envs/env_0/Robot/joints/Jaw",
+   "name": "Jaw",
+   "type": "PhysicsRevoluteJoint",
+   "body0": "/World/envs/env_0/Robot/gripper",
+   "body1": "/World/envs/env_0/Robot/jaw",
+   "localPos0": [
+    0.02020001783967018,
+    0.018800007179379463,
+    -0.02340001054108143
+   ],
+   "localRot0_wxyz": [
+    0.7071055173873901,
+    0.7071080207824707,
+    6.31822985042163e-08,
+    1.6858581375345238e-07
+   ],
+   "localPos1": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "localRot1_wxyz": [
+    1.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   "axis": "Z",
+   "lower_deg": -10.000003814697266,
+   "upper_deg": 100.00003814697266
+  },
+  {
+   "path": "/World/envs/env_0/Robot/root_joint",
+   "name": "root_joint",
+   "type": "PhysicsFixedJoint",
+   "body0": null,
+   "body1": "/World/envs/env_0/Robot/base",
+   "localPos0": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "localRot0_wxyz": [
+    1.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   "localPos1": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "localRot1_wxyz": [
+    0.7071067690849304,
+    0.0,
+    0.0,
+    -0.7071067690849304
+   ]
+  },
+  {
+   "path": "/World/envs/env_0/Robot/base/FixedJoint",
+   "name": "FixedJoint",
+   "type": "PhysicsFixedJoint",
+   "body0": null,
+   "body1": "/World/envs/env_0/Robot/base",
+   "localPos0": [
+    -0.05000000074505806,
+    0.0,
+    0.0
+   ],
+   "localRot0_wxyz": [
+    0.7071067690849304,
+    0.0,
+    0.0,
+    0.7071067690849304
+   ],
+   "localPos1": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "localRot1_wxyz": [
+    1.0,
+    0.0,
+    0.0,
+    0.0
+   ]
+  }
+ ],
+ "bodies": {
+  "base": {
+   "path": "/World/envs/env_0/Robot/base",
+   "world_scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  "shoulder": {
+   "path": "/World/envs/env_0/Robot/shoulder",
+   "world_scale": [
+    1.0000000000000002,
+    1.0000000000000002,
+    1.0000000000000002
+   ]
+  },
+  "upper_arm": {
+   "path": "/World/envs/env_0/Robot/upper_arm",
+   "world_scale": [
+    0.9999999999999999,
+    1.0,
+    0.9999999999999999
+   ]
+  },
+  "lower_arm": {
+   "path": "/World/envs/env_0/Robot/lower_arm",
+   "world_scale": [
+    1.0,
+    0.9999999999999999,
+    1.0
+   ]
+  },
+  "wrist": {
+   "path": "/World/envs/env_0/Robot/wrist",
+   "world_scale": [
+    1.0,
+    0.9999999999999999,
+    1.0
+   ]
+  },
+  "gripper": {
+   "path": "/World/envs/env_0/Robot/gripper",
+   "world_scale": [
+    1.0,
+    1.0000000000000002,
+    1.0000000000000002
+   ]
+  },
+  "jaw": {
+   "path": "/World/envs/env_0/Robot/jaw",
+   "world_scale": [
+    0.9999999999999999,
+    1.0,
+    0.9999999999999999
+   ]
+  }
+ },
+ "soft_joint_pos_limits": [
+  [
+   -1.9198598861694336,
+   1.9198598861694336
+  ],
+  [
+   -1.7453298568725586,
+   1.7453298568725586
+  ],
+  [
+   -1.7453298568725586,
+   1.5707998275756836
+  ],
+  [
+   -1.65805983543396,
+   1.65805983543396
+  ],
+  [
+   -2.792530059814453,
+   2.792530059814453
+  ],
+  [
+   -0.17453300952911377,
+   1.7453298568725586
+  ]
+ ],
+ "default_joint_pos": [
+  -0.2736000120639801,
+  -0.6108999848365784,
+  -0.07450000196695328,
+  1.514799952507019,
+  -1.6033999919891357,
+  -0.14650000631809235
+ ]
+}

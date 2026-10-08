@@ -1,0 +1,51 @@
+# Atomic-motion primitives for the SO-101 (LeRobot) 5-DoF arm, Isaac Lab Workshop sim.
+#
+# Same schema as configs/primitives_franka.yaml for the MV_* units. Read by
+# interpreters/so101_atomic_controller.py (So101AtomicExec).
+#
+# Frame ("task"): world orientation, origin at the robot base. +X from the robot toward the
+# work area, +Z up. In the Workshop scene the base link is yawed +90 deg in the world; the
+# controller converts, so these vectors are plain task-frame directions.
+step_m: 0.02
+rot_step_deg: 10.0
+
+atomic_primitives:
+  # Same convention as the real Franka rig (configs/primitives_franka.yaml): the robot's LEFT
+  # is -Y. Checked on the Workshop sim by projecting each token's TCP motion into the
+  # external camera (scripts/trajectory/real2sim/so101_workshop/verify_motion.py).
+  MV_FWD: [1.0, 0.0, 0.0]
+  MV_BACK: [-1.0, 0.0, 0.0]
+  MV_LEFT: [0.0, -1.0, 0.0]
+  MV_RIGHT: [0.0, 1.0, 0.0]
+  MV_UP: [0.0, 0.0, 1.0]
+  MV_DOWN: [0.0, 0.0, -1.0]
+
+# Rotation units (core/action_units.py RT_ATOMS) on a 5-DoF arm. The vocabulary is shared and
+# unchanged; this is what the SO-101 can physically realise:
+#   RT_PITCH_FWD / RT_PITCH_BACK  tool pitch in the arm plane (FWD: fingertips swing away
+#                                 from the base), TCP held. NOTE: about the arm-plane normal,
+#                                 which equals the shared definition (world -Y, tips toward
+#                                 MV_FWD) only while the arm points along +X; elsewhere it is
+#                                 that axis turned by the base angle. A 5-DoF arm cannot tilt
+#                                 about a fixed world axis in every pose.
+#   RT_YAW_CW / RT_YAW_CCW        hand turned about the vertical through Wrist_Roll (sense seen
+#                                 from above), TCP held
+#   RT_ROLL_LEFT / RT_ROLL_RIGHT  NOT realisable (needs a joint out of the arm plane): always
+#                                 refused with reason "unsupported_on_5dof", the arm never moves
+rotation_units:
+  supported: [RT_PITCH_FWD, RT_PITCH_BACK, RT_YAW_CW, RT_YAW_CCW]
+  unsupported: [RT_ROLL_LEFT, RT_ROLL_RIGHT]
+
+# Measured on the Workshop sim (verify_motion.py, pitch 47 deg, Wrist_Roll -90 deg), pass
+# criteria fixed before the run. Recorded here so a change of executor can be compared.
+measured:
+  translation:            # 10 start points x 12 tokens, 120 executed / 0 refused
+    travel_mm: [19.80, 20.13]          # criterion 18.0-22.0
+    off_axis_max_mm: 0.80              # criterion <= 2.0
+    overshoot_max_mm: 0.69             # criterion <= 2.0
+    pitch_change_max_deg: 0.28         # criterion <= 1.0
+  random_walk:            # 80 tokens out, the same 80 reversed back
+    return_error_mm: 0.095             # criterion <= 2.0
+  rotation:               # 23 executed / 1 refused
+    angle_deg: [9.90, 10.12]           # criterion 9.0-11.0
+    tcp_drift_max_mm: 1.50             # criterion <= 3.0
