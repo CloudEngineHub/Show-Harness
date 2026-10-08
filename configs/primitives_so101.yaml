@@ -36,15 +36,16 @@ rotation_units:
   supported: [RT_PITCH_FWD, RT_PITCH_BACK, RT_YAW_CW, RT_YAW_CCW]
   unsupported: [RT_ROLL_LEFT, RT_ROLL_RIGHT]
 
-# Measured on the Workshop sim (verify_motion.py, pitch 47 deg, Wrist_Roll -90 deg), pass
-# criteria fixed before the run. Recorded here so a change of executor can be compared.
+# Measured on the Workshop sim by scripts/trajectory/real2sim/so101_workshop/verify_motion.py
+# (2026-10-08, seed 0, pitch 47 deg, Wrist_Roll -90 deg); pass criteria are fixed in that
+# script before the run. Recorded here so a change of executor can be compared.
 measured:
-  translation:            # 10 start points x 12 tokens, 120 executed / 0 refused
-    travel_mm: [19.80, 20.13]          # criterion 18.0-22.0
-    off_axis_max_mm: 0.80              # criterion <= 2.0
-    overshoot_max_mm: 0.69             # criterion <= 2.0
-    pitch_change_max_deg: 0.28         # criterion <= 1.0
-  random_walk:            # 80 tokens out, the same 80 reversed back
+  translation:            # 8 start points x 12 tokens: 96 executed / 0 refused, 0 contacts
+    travel_mm: [19.80, 20.12]          # criterion 18.0-22.0
+    off_axis_max_mm: 0.76              # criterion <= 2.0
+    overshoot_max_mm: 0.65             # criterion <= 2.0
+    pitch_change_max_deg: 0.27         # criterion <= 1.0
+  random_walk:            # 80 tokens out (2 refused: ik_pos), the same 80 reversed back
     return_error_mm: 0.095             # criterion <= 2.0
   rotation:               # 23 executed / 1 refused
     angle_deg: [9.90, 10.12]           # criterion 9.0-11.0

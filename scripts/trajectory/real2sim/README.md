@@ -19,7 +19,9 @@ real2sim/
 │   ├── __init__.py          make_backend("maniskill" | "robolab" | "libero", ...)
 │   ├── maniskill.py
 │   ├── robolab.py           RoboLab / Isaac Lab (relative IK, 7-dim action)
-│   └── libero.py            LIBERO family (OSC delta pose, rotation tokens, fixture poses)
+│   ├── libero.py            LIBERO family (OSC delta pose, rotation tokens, fixture poses)
+│   └── so101_workshop.py    SO-101 on the Isaac Lab Workshop (joint targets; motion core in
+│                            interpreters/so101_atomic_controller.py)
 ├── maniskill/
 │   ├── tasks.py             Task table + layout sampling (shared with deployment eval)
 │   ├── oracle.py            Scheme A: privileged oracle (blockpap / blockstack)
@@ -34,6 +36,8 @@ real2sim/
 │   ├── follow_tokenize.py   Scheme D step 2
 │   ├── calibrate_fingertip.py      Behavioural flange-to-fingertip sweep (see gotchas)
 │   └── make_short_finger_asset.py  Real rig's fingertip USD (see docs/simulators.md)
+├── so101_workshop/          Run inside the Workshop image; camera-contract and motion checks,
+│                            USD extraction, privileged scene geometry (docs/simulators.md)
 └── libero/                  No oracle: LIBERO ships human demos, so Scheme D only
     ├── follow_tokenize.py   Scheme D: re-execute recorded demos as atomic rollouts
     ├── layout_generate.py   Trajectories for scenes that have NO demo (Objects Layout)
