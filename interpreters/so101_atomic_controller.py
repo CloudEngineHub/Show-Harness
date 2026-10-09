@@ -392,13 +392,20 @@ class So101ArmController(abc.ABC):
 # would bend the motion off its axis or drop the orientation: a label that lies.
 #
 # Rotation (RT_*): the SO-101 can only tilt the hand about the arm-plane normal, and turn it
-# about the vertical through Wrist_Roll. So:
+# about its own tool axis through Wrist_Roll. So:
 #   RT_PITCH_FWD / RT_PITCH_BACK  in-plane tool pitch -/+ ``rot_step_rad`` (FWD tips the
 #                                 fingertips outward, away from the base). The axis is the
 #                                 arm-plane normal: the shared world -Y only while the arm
 #                                 points along +X (a 5-DoF hand cannot tilt about a fixed
 #                                 world axis in every pose)
-#   RT_YAW_CCW / RT_YAW_CW        closing-axis yaw +/- ``rot_step_rad`` (seen from above)
+#   RT_YAW_CCW / RT_YAW_CW        Wrist_Roll +/- ``rot_step_rad`` in roll mode (the default),
+#                                 the closing-axis yaw in yaw mode; sense seen from above. The
+#                                 axis is the TOOL axis: the shared world vertical only while
+#                                 the tool points straight down. In roll mode, at tool pitch p
+#                                 a token is rot_step * sin(p) of yaw and the rest tips the
+#                                 closing axis out of horizontal (pitch 47 deg: 7.3 deg of yaw
+#                                 and ~7 deg of tilt per token), so every token moves the roll
+#                                 away from ROLL_CLOSING_HORIZONTAL
 #   RT_ROLL_*                     not realisable -> always refused
 # The TCP position is held during a rotation.
 #

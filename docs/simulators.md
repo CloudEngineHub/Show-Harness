@@ -211,8 +211,16 @@ within the arm plane:
 | Unit | On SO-101 |
 | --- | --- |
 | `RT_PITCH_FWD` / `RT_PITCH_BACK` | tool pitch in the arm plane, TCP held; about the arm-plane normal, which equals the shared world axis only while the arm points along +X |
-| `RT_YAW_CW` / `RT_YAW_CCW` | hand turned about the vertical through Wrist_Roll, TCP held |
+| `RT_YAW_CW` / `RT_YAW_CCW` | hand turned through Wrist_Roll, TCP held; about the tool axis, which equals the shared world vertical only while the tool points straight down |
 | `RT_ROLL_LEFT` / `RT_ROLL_RIGHT` | **not realisable**: always refused with reason `unsupported_on_5dof`; the arm does not move |
+
+So neither realisable rotation is about a fixed world axis in every pose. For yaw the gap grows
+with the tilt of the hand. In the default roll mode, at tool pitch *p* (90° = straight down) one
+token gives 10° × sin *p* about the vertical, and the rest tips the jaw's closing axis out of
+horizontal. At the 47° used for the measurements below, that is 7.3° of yaw per token and about
+7° / 14° / 20° of tilt after one / two / three tokens (kinematics, reproduced on the unit-test
+arm). That reaches the 13–22° of tilt at which the fixed finger dips and grasps fail (module
+docstring of `interpreters/so101_atomic_controller.py`).
 
 Refusals are whole-token and deterministic. Every token is checked before it runs (end-point
 and mid-point IK feasibility, joint-limit margin, the whole hand's collision hull above the

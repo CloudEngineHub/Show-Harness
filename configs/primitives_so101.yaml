@@ -28,8 +28,16 @@ atomic_primitives:
 #                                 MV_FWD) only while the arm points along +X; elsewhere it is
 #                                 that axis turned by the base angle. A 5-DoF arm cannot tilt
 #                                 about a fixed world axis in every pose.
-#   RT_YAW_CW / RT_YAW_CCW        hand turned about the vertical through Wrist_Roll (sense seen
-#                                 from above), TCP held
+#   RT_YAW_CW / RT_YAW_CCW        hand turned through Wrist_Roll (sense seen from above), TCP
+#                                 held. NOTE: about the TOOL axis, which equals the shared
+#                                 definition (the world vertical) only while the tool points
+#                                 straight down. In the default roll mode, at tool pitch p one
+#                                 token is 10 deg * sin(p) of yaw; the rest tips the jaw's
+#                                 closing axis out of horizontal. At p = 47 deg: 7.3 deg of yaw
+#                                 and about 7 / 14 / 20 deg of tilt after 1 / 2 / 3 tokens
+#                                 (kinematics, reproduced on the unit-test arm), i.e. into the
+#                                 13-22 deg where interpreters/so101_atomic_controller.py
+#                                 records failed grasps.
 #   RT_ROLL_LEFT / RT_ROLL_RIGHT  NOT realisable (needs a joint out of the arm plane): always
 #                                 refused with reason "unsupported_on_5dof", the arm never moves
 rotation_units:
