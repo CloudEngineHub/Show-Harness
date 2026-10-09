@@ -26,6 +26,9 @@ BACKENDS: dict[str, tuple[str, str]] = {
     "robolab": ("scripts.trajectory.real2sim.backends.robolab", "RobolabBackend"),
     # LIBERO / LIBERO-plus: run with <LIBERO-plus>/.venv/bin/python (see backends/libero.py).
     "libero": ("scripts.trajectory.real2sim.backends.libero", "LiberoBackend"),
+    # SO-101 (LeRobot) on the Isaac Lab Sim-to-Real SO-101 Workshop: Isaac Sim must be running
+    # first, inside the Workshop image -- see backends/so101_workshop.py.
+    "so101_workshop": ("scripts.trajectory.real2sim.backends.so101_workshop", "So101WorkshopBackend"),
 }
 
 

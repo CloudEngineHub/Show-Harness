@@ -13,6 +13,7 @@ the vocabulary, prompts, and policies stay unchanged.
 | --- | --- | --- |
 | `maniskill_atomic_controller.py` | ManiSkill | 4-D `pd_ee_delta_pos` (translation only) |
 | `robolab_atomic_controller.py` | Isaac Lab | 7-D relative differential-IK with per-step orientation hold |
+| `so101_atomic_controller.py` | SO-101 (Isaac Lab Workshop) | joint targets from in-house IK; RT_PITCH/RT_YAW on 5 DoF, RT_ROLL refused (docs/simulators.md) |
 
 **Real arms** integrate absolute Cartesian setpoints against a duck-typed
 robot object:

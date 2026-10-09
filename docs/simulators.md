@@ -1,6 +1,7 @@
 # Simulators
 
-Show-Harness integrates three simulators. They serve two roles:
+Show-Harness integrates three simulators, plus a second embodiment, the LeRobot SO-101 on an
+Isaac Lab scene ([last section](#so-101-isaac-lab-workshop)). They serve two roles:
 
 1. **Zero-shot evaluation** — run the deployment pipelines (the subgoal planner
    stack or the fine-tuned action model, see `docs/finetuned.md`) in sim
@@ -168,3 +169,80 @@ task names `--list-tasks` prints to build a set. Quality gate before training:
 `python scripts/robolab/check_dataset.py <dir>` (nonzero exit = do not train on
 it). Prefer rotation-insensitive objects — the vocabulary has no wrist-rotation
 token, so elongated objects are ungraspable.
+
+## SO-101 (Isaac Lab Workshop)
+
+The [SO-101](https://github.com/TheRobotStudio/SO-ARM100) is LeRobot's low-cost 5-DoF arm.
+It runs here on NVIDIA's
+[Sim-to-Real SO-101 Workshop](https://github.com/isaac-sim/Sim-to-Real-SO-101-Workshop)
+(tag `v1.0`, Isaac Sim 5.1 / Isaac Lab), on its "vials → rack" task
+`Lerobot-So101-Teleop-Vials-To-Rack-DR`. This integration covers simulation only for now.
+The real-arm backend (a LeRobot follower behind the same controller) is a follow-up, once it
+has been validated on hardware.
+
+| Path | What it is |
+| --- | --- |
+| `interpreters/so101_kinematics.py` | numpy FK/IK on the USD's own joint chain (`configs/so101_chain.json`) |
+| `interpreters/so101_atomic_controller.py` | `So101ArmController` (motion core, I/O-agnostic) + `So101AtomicExec` (token executor) |
+| `configs/primitives_so101.yaml` | MV_* vectors, rotation units, measured execution numbers |
+| `configs/robot_so101_workshop.yaml` | task, scene variants, **the camera contract** |
+| `scripts/trajectory/real2sim/backends/so101_workshop.py` | `AtomicSimEnv` backend: joints, cameras, contact sensor, success |
+| `scripts/trajectory/real2sim/so101_workshop/` | `run_in_docker.sh`, `check_views.py`, `verify_motion.py`, USD extraction scripts, privileged `scene.py` |
+
+Setup. The Workshop brings its own Isaac Sim / Isaac Lab stack in a Docker image, so nothing
+from it is installed into this repo's environments. As with RoboLab, its dependencies stay
+isolated from the base environment. Build the image once from a checkout at tag `v1.0`, then
+run any script of this repo inside it through the wrapper. The wrapper mounts the repo
+read-only, puts it on `PYTHONPATH`, and writes outputs to `rollouts/so101_workshop/`.
+
+```bash
+git clone -b v1.0 https://github.com/isaac-sim/Sim-to-Real-SO-101-Workshop ~/sim2real/Sim-to-Real-SO-101-Workshop
+(cd ~/sim2real/Sim-to-Real-SO-101-Workshop && docker build -t teleop-docker -f docker/sim/Dockerfile .)
+export WORKSHOP_ROOT=~/sim2real/Sim-to-Real-SO-101-Workshop
+W=scripts/trajectory/real2sim/so101_workshop
+bash $W/run_in_docker.sh $W/check_views.py   --out /workspace/out/check_views     # camera contract, exit 1 on mismatch
+bash $W/run_in_docker.sh $W/verify_motion.py --out /workspace/out/verify_motion   # execution numbers, exit 1 on FAIL
+```
+
+Rotation units on 5 DoF. The shared vocabulary is unchanged, and the interpreter states what
+the arm can realise. Pitch, Elbow and Wrist_Pitch are parallel, so the tool axis can only tilt
+within the arm plane:
+
+| Unit | On SO-101 |
+| --- | --- |
+| `RT_PITCH_FWD` / `RT_PITCH_BACK` | tool pitch in the arm plane, TCP held; about the arm-plane normal, which equals the shared world axis only while the arm points along +X |
+| `RT_YAW_CW` / `RT_YAW_CCW` | hand turned through Wrist_Roll, TCP held; about the tool axis, which equals the shared world vertical only while the tool points straight down |
+| `RT_ROLL_LEFT` / `RT_ROLL_RIGHT` | **not realisable**: always refused with reason `unsupported_on_5dof`; the arm does not move |
+
+So neither realisable rotation is about a fixed world axis in every pose. For yaw the gap grows
+with the tilt of the hand. In the default roll mode, at tool pitch *p* (90° = straight down) one
+token gives 10° × sin *p* about the vertical, and the rest tips the jaw's closing axis out of
+horizontal. At the 47° used for the measurements below, that is 7.3° of yaw per token and about
+7° / 14° / 20° of tilt after one / two / three tokens (kinematics, reproduced on the unit-test
+arm). That reaches the 13–22° of tilt at which the fixed finger dips and grasps fail (module
+docstring of `interpreters/so101_atomic_controller.py`).
+
+Refusals are whole-token and deterministic. Every token is checked before it runs (end-point
+and mid-point IK feasibility, joint-limit margin, the whole hand's collision hull above the
+table, workspace box). `So101AtomicExec.check()` answers without moving, so a generator never
+records a frame for a token that would be refused. The backend does not claim
+`supports_rotation`, because that contract means an arbitrary world-axis rotation. Execute
+tokens with `So101AtomicExec`, not the generic `AtomicExec`.
+
+Calibration facts (load-bearing; measured tables in the yaml comments):
+
+- The SO-101's joint gains are low. The executor servos to a fixed target, capped at
+  5 mm per 30 Hz control step, learns gravity sag at rest, and returns only once the arm is
+  at rest. Measured by `verify_motion.py` (pitch 47°): one MV token moves 19.8–20.1 mm (96 tokens), at
+  most 0.8 mm off-axis and 0.7 mm of overshoot. 80 random tokens and their reverse return
+  within 0.1 mm. RT tokens turn 9.9–10.1° with at most 1.5 mm of TCP drift.
+- Camera contract (`configs/robot_so101_workshop.yaml`): agentview `external_D455` rotated
+  90°, wrist `ego` rotated 180°, both letterboxed to 256. Raw, neither view matches the
+  shared prompt geometry. `check_views.py` measures it: agentview by TCP projection, wrist on
+  the rendered frames (scene shift per executed token, and the fingers found as the pixels
+  that ride with the camera). The rotated agentview is portrait, so its letterbox bars are
+  left/right.
+- Success is the Workshop's own `vial_placed` term, and it is lenient. It fires at the frame
+  the fingers open if a just-held vial is within 45° of vertical and inside the rack's
+  footprint, and it stays set. It does not check the hole, the vial staying upright, or which
+  vial it was, so review rollouts by eye before trusting a success rate.
